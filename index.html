@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .input-group {
+      margin-bottom: 10px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    #result {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Weather App</h2>
+    <form id="weatherForm">
+      <div class="input-group">
+        <label for="cities">Cities:</label>
+        <input type="text" id="cities" name="cities" placeholder="Enter city names (comma-separated)">
+      </div>
+      <button type="submit">Get Weather</button>
+    </form>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('weatherForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const citiesInput = document.getElementById('cities');
+      const cities = citiesInput.value.split(',');
+
+      const request = new XMLHttpRequest();
+      request.open('POST', '/getWeather');
+      request.setRequestHeader('Content-Type', 'application/json');
+      request.onload = function() {
+        if (request.status === 200) {
+          const response = JSON.parse(request.responseText);
+          displayWeather(response.weather);
+        } else {
+          console.error('Failed to fetch weather:', request.status);
+        }
+      };
+
+      const requestBody = { cities };
+      request.send(JSON.stringify(requestBody));
+
+      citiesInput.value = '';
+    });
+
+    function displayWeather(weatherData) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      for (const city in weatherData) {
+        const p = document.createElement('p');
+        p.textContent = `${city}: ${weatherData[city]}`;
+        resultDiv.appendChild(p);
+      }
+    }
+  </script>
+</body>
+</html>
